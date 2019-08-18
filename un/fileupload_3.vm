@@ -1,0 +1,338 @@
+
+#set($htmlTitle = "File Upload")
+$web.startHtmlHeader("$htmlTitle")
+	$web.addJS("/studio/studio.js")
+	
+<style>
+#video {
+  border: 1px solid black;
+  box-shadow: 2px 2px 3px black;
+  width:320px;
+  height:240px;
+}
+
+#photo {
+  border: 1px solid black;
+  box-shadow: 2px 2px 3px black;
+  width:320px;
+  height:240px;
+}
+
+#canvas {
+  display:none;
+}
+#canvas_224 {
+  display:none;
+}
+
+.camera {
+  width: 340px;
+  display:inline-block;
+}
+
+.output {
+  width: 340px;
+  display:inline-block;
+}
+
+#startbutton {
+  display:block;
+  position:relative;
+  margin-left:auto;
+  margin-right:auto;
+  bottom:32px;
+  background-color: rgba(0, 150, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0px 0px 1px 2px rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+  font-family: "Lucida Grande", "Arial", sans-serif;
+  color: rgba(255, 255, 255, 1.0);
+}
+
+.contentarea {
+  font-size: 16px;
+  font-family: "Lucida Grande", "Arial", sans-serif;
+  width: 760px;
+}
+</style>	
+	<script type="text/javascript">
+	
+	var imageId = 0, imageSig = '0';
+	
+	var uploadFiles = function(event){
+			var fileList = event.currentTarget.files;
+			if (fileList.length !== 1) return;
+			var file = fileList[0];
+			sendDMFile(file);
+
+		}
+	var buildParameters = function() {
+            // The following are required:
+            var params = {};
+            var picker_name = "filepicker2";
+            var upload_type = "files";
+            var file_type = "dms";
+            var creator_id = null;
+            var project_id = $web.getP("pid");
+            var projectcompany_id = null;
+            var single = "yes";
+            var filter = "jpg,jpeg,png,tiff";
+            var return_target = null;
+
+            // The following are not required for file upload/maybe for doc upload?
+            var content_source = 1;
+            var from_object_type = "folder";
+            var from_object_id = 3662;
+            var from_object_name = "Service Req";
+            var from_folder_path = "/";
+            var revisenodeids = null;
+            var nodefiles = null;
+            var from_object_type_2 = null;
+            var from_object_id_2 = null;
+            var from_fileids = null;
+            var stream = null;
+            var get_contents = null;
+            var budget_id = null;
+            var duplicatecheck = null;
+            var postcomplete = null;
+            var emailtarget = null;
+            var xrefdata = null;
+            var selectFileName = null;
+            var refreshOpener = true;
+            var maxsize = 1048576;
+            var ojetHomePageObject = null;
+            var searchType = null;
+
+            params["picker_name"] =(picker_name==null?'':picker_name);
+            if(content_source !=null)
+                params["content_source"]=(content_source==null?'':content_source);
+            if(upload_type !=null)
+                params["upload_type"]=(upload_type==null?'':upload_type);
+            if(file_type!=null)
+                params["file_type"]=(file_type==null?'':file_type);
+            params["from_object_type"]=(from_object_type==null?'':from_object_type);
+            params["from_object_id"]=(from_object_id==null?'':from_object_id);
+            params["from_object_name"]=(from_object_name==null?'':from_object_name);
+            params["from_folder_path"]=(from_folder_path==null?'':from_folder_path);
+            params["revisenodeids"]=(revisenodeids==null?'':revisenodeids);
+            params["nodefiles"]=(nodefiles==null?'':nodefiles);
+            if(creator_id !=null)
+                params["creator_id"]=(creator_id==null?'':creator_id);
+            if(project_id !=null)
+                params["project_id"]=(project_id==null?'':project_id);
+            if(projectcompany_id !=null)
+                params["projectcompany_id"]=(projectcompany_id==null?'':projectcompany_id);
+            params["from_object_type_2"]=(from_object_type_2==null?'':from_object_type_2);
+            params["from_object_id_2"]=(from_object_id_2==null?'':from_object_id_2);
+            params["from_fileids"]=(from_fileids==null?'':from_fileids);
+            if(single !=null)
+                params["single"]=(single==null?'':single);
+            if(filter !=null)
+                params["filter"]=(filter==null?'':filter);
+            if(stream !=null)
+                params["stream"]=(stream==null?'':stream);
+            if(get_contents !=null)
+                params["get_contents"]=(get_contents==null?'':get_contents);
+            params["return_target"]=(return_target==null?'': U.urefSearch(return_target)) ;
+            params["budget_id"]=(budget_id==null?'':budget_id);
+            params["duplicatecheck"]=duplicatecheck;
+            params["postcomplete"]=(postcomplete==null?'':postcomplete);
+            params["emailtarget"]=(emailtarget==null?'':emailtarget);
+            params["xrefdata"]=(xrefdata==null?'':xrefdata);
+            params["selectFileName"]=(selectFileName==null?'':selectFileName);
+            params["refreshOpener"]=(refreshOpener==null?'':refreshOpener);
+            params["maxsize"]=(maxsize==null?'':maxsize);
+            params["__token"]=U.token;
+            params["ojetHomePageObject"]="";
+            params["searchType"]="";
+            return params;
+        }
+	var fileData = {};
+	
+	function sendDMFile() {
+			console.log('DMSend webcam file --');
+			var url = U.appendRoot("/bp/sys/dm/new/upload?__uref="+U.uref);
+			var fd = new FormData();
+			var params = buildParameters();
+			params["filesize"]=3000;
+			params["__token"] = U.token;
+			params["__uref"] = U.uref;
+			fd.append('params',JSON.stringify(params));
+			var fileMetaDataArr = [];
+			const random = Math.round(Math.random()*100000);
+			const filename = 'webcam_'+random;
+            var fileInfo = {id: 0, fileName: filename, docTitle: "",
+                                    fileNameHidden: filename, parentId: 0,
+                                    fileSize:3000};
+            fileMetaDataArr.push(fileInfo);
+            fd.append('fileMetaDataArr[]', JSON.stringify(fileMetaDataArr));
+			fd.append('0', canvas_224.toDataURL());
+			var resp;
+			var imageId;
+			$.ajaxSetup({async: false});
+			$.ajax({
+				url         : url,
+				data        : fd,
+				cache       : false,
+				contentType : false,
+				processData : false,
+				type        : 'POST',
+				success     : function(rs, textStatus, jqXHR) {
+					resp = rs.returnError;
+					if (resp.error == "yes" && resp.errormsg !="") {
+						U.Validation(resp.errormsg);
+					}
+					else if (resp.uploadedfiles && resp.uploadedfiles.length >= 1) {
+						var fl = resp.uploadedfiles[0];
+						console.log('sendFile DM resp :'+resp+'  ::'+fl.id);
+						
+						imageId = fl.id;
+						var sig = resp.signature;
+						imageSig = sig[imageId];
+						const image_src =  U.appendRoot("/bp/file/getImageFile?id="+imageId+"&sig="+imageSig);
+						console.log('sendDMFile image src : '+image_src);
+						fileData = {"image_id":imageId,"resp":resp,"image_src":image_src,"error":"no","fl":fl};
+					}
+				},
+				error		: function(jqxhr, textStatus, errorMessage) {
+					//self.dragText(self.dragPanelText);
+					U.Validation(errormsg);
+						
+					fileData =  {"image_id":imageId,"resp":resp,"image_src":image_src,"error":"yes"};
+				}
+			});
+			
+		}
+		function getFileData(){
+			return fileData;
+		}
+		function processFile(fileData,bpJson) {
+			const imageId = fileData.image_id;
+			const resp = fileData.resp;
+			var sig = resp.signature;
+			imageSig = sig[imageId];
+			var module= "uxsrq";
+			var no_workflow=false;
+			var wf_id=3452;
+			if(fileData.BP == 'Procurement'){
+				module= uxproc1;
+				wf_id  = 3454
+			}
+			console.log('processFile starting for model :'+module);
+			window.opener.invokeRecord(module,no_workflow,wf_id, fileData.fl.doc_id, bpJson);
+		}
+       
+		</script>
+$web.endHtmlHeader()
+<body style="background-color:#FFFFF;">
+
+<input id="uploadfiles" type="file" style="margin:20px;width:70%;display:none;" accept="image/*">
+
+ <div id="status" style="display:none" >Loading model...</div>
+ <canvas  style="margin:20px"  id="data-canvas" width="224" height="224"></canvas>
+ <div class="camera">
+	<video id="video">Video stream not available.</video>
+	 <button id="loadbutton">Start</button>
+    <button id="startbutton">Take photo</button>
+  </div>
+  <canvas id="canvas">  </canvas>
+  <canvas id="canvas_224" height="224" width="224">  </canvas>
+  <div class="output">
+    <img id="photo"  style="display:none;" alt="The screen capture will appear in this box.">
+	<img id="photo_224" style="width:224px;height:224px;" alt="The screen capture will appear in this box.">
+  </div>
+
+</body>
+
+
+<script>
+  var width = 320;    // We will scale the photo width to this
+  var height = 0;     // This will be computed based on the input stream
+
+  var streaming = false;
+
+  var video = null;
+  var canvas = null;
+  var canvas_224 = null;
+  var photo = null;
+  var photo_224 = null;
+  var startbutton = null;
+
+	function clearPhoto() {
+		var context = canvas.getContext('2d');
+		context.fillStyle = "#AAA";
+		context.fillRect(0, 0, canvas.width, canvas.height);
+
+		var data = canvas.toDataURL('image/png');
+		photo.setAttribute('src', data);
+		//-------- 224
+		
+		var context_224 = canvas_224.getContext('2d');
+		context_224.fillStyle = "#AAA";
+		context_224.fillRect(0, 0, context_224.width, context_224.height);
+
+		var data2 = canvas_224.toDataURL('image/png');
+		photo_224.setAttribute('src', data2);
+	}
+  
+	function takePicture() {
+		var context = canvas.getContext('2d');
+		var context_224 = canvas_224.getContext('2d');
+		if (width && height) {
+		  canvas.width = width;
+		  canvas.height = height;
+		  context.drawImage(video, 0, 0, width, height);
+		  		
+		  var data = canvas.toDataURL('image/png');
+		  photo.setAttribute('src', data);
+		  
+		  canvas_224.width = 224;
+		  canvas_224.height = 224;
+		  context_224.drawImage(video, 0, 0, 224, 224);
+		  		
+		  var data = canvas_224.toDataURL('image/png');
+		  photo_224.setAttribute('src', data);
+		} else {
+		  clearPhoto();
+		}
+	 }
+	function startup() {
+		video = document.getElementById('video');
+		canvas = document.getElementById('canvas');
+		photo = document.getElementById('photo');
+		canvas_224 = document.getElementById('canvas_224');
+		photo_224 = document.getElementById('photo_224');
+		startbutton = document.getElementById('startbutton');
+		video.addEventListener('canplay', function(ev){
+		  if (!streaming) {
+			height = video.videoHeight / (video.videoWidth/width);
+		  
+			video.setAttribute('width', width);
+			video.setAttribute('height', height);
+			canvas.setAttribute('width', width);
+			canvas.setAttribute('height', height);
+			console.log('Canvas ht :'+height+'  w:'+width);
+			streaming = true;
+		  }
+		}, false);
+		navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+			.then(function(stream) {
+				video.srcObject = stream;
+				video.play();
+			})
+			.catch(function(err) {
+				console.log("An error occurred: " + err);
+		});	
+		startbutton.addEventListener('click', function(ev){
+			  takePicture();
+			  ev.preventDefault();
+			}, false);
+		clearPhoto();
+	  }
+	  loadbutton.addEventListener('click', function(ev){
+			  startup();
+			}, false);
+	//window.addEventListener('load', startup, false);  
+</script>
+<script src="/dist_10/simple-od.e31bb0bc.js"></script>
+</html>

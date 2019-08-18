@@ -1,0 +1,170 @@
+<!doctype html> 
+<style>
+#video {
+  border: 1px solid black;
+  box-shadow: 2px 2px 3px black;
+  width:320px;
+  height:240px;
+}
+
+#photo {
+  border: 1px solid black;
+  box-shadow: 2px 2px 3px black;
+  width:320px;
+  height:240px;
+}
+
+#canvas {
+  display:none;
+}
+#canvas_224 {
+  display:none;
+}
+
+.camera {
+  width: 340px;
+  display:inline-block;
+}
+
+.output {
+  width: 340px;
+  display:inline-block;
+}
+
+#startbutton {
+  display:block;
+  position:relative;
+  margin-left:auto;
+  margin-right:auto;
+  bottom:32px;
+  background-color: rgba(0, 150, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0px 0px 1px 2px rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+  font-family: "Lucida Grande", "Arial", sans-serif;
+  color: rgba(255, 255, 255, 1.0);
+}
+
+.contentarea {
+  font-size: 16px;
+  font-family: "Lucida Grande", "Arial", sans-serif;
+  width: 760px;
+}
+</style>
+<body>
+<div class="camera">
+    <video id="video">Video stream not available.</video>
+    <button id="startbutton">Take photo</button>
+  </div>
+  <canvas id="canvas">  </canvas>
+  <canvas id="canvas_224" height="224" width="224">  </canvas>
+  <div class="output">
+    <img id="photo"  alt="The screen capture will appear in this box.">
+	<img id="photo_224" style="width:224px;height:224px;" alt="The screen capture will appear in this box.">
+  </div>
+
+</body>
+
+<script >
+
+	function sendDMFile(){
+
+		$.ajax({
+		  type: "POST",
+		  url: "server url",
+		  data: { 
+			 imgBase64: canvas_224.toDataURL()
+		  }
+		}).done(function(o) {
+		  console.log('saved'); 
+		  
+		});
+	}
+	
+//(function() {
+  var width = 320;    // We will scale the photo width to this
+  var height = 0;     // This will be computed based on the input stream
+
+  var streaming = false;
+
+  var video = null;
+  var canvas = null;
+  var canvas_224 = null;
+  var photo = null;
+  var photo_224 = null;
+  var startbutton = null;
+
+	function clearPhoto() {
+		var context = canvas.getContext('2d');
+		context.fillStyle = "#AAA";
+		context.fillRect(0, 0, canvas.width, canvas.height);
+
+		var data = canvas.toDataURL('image/png');
+		photo.setAttribute('src', data);
+		//-------- 224
+		
+		var context_224 = canvas_224.getContext('2d');
+		context_224.fillStyle = "#AAA";
+		context_224.fillRect(0, 0, context_224.width, context_224.height);
+
+		var data2 = canvas_224.toDataURL('image/png');
+		photo_224.setAttribute('src', data2);
+	}
+  
+	function takePicture() {
+		var context = canvas.getContext('2d');
+		var context_224 = canvas_224.getContext('2d');
+		if (width && height) {
+		  canvas.width = width;
+		  canvas.height = height;
+		  context.drawImage(video, 0, 0, width, height);
+		  		
+		  var data = canvas.toDataURL('image/png');
+		  photo.setAttribute('src', data);
+		  
+		  canvas_224.width = 224;
+		  canvas_224.height = 224;
+		  context_224.drawImage(video, 0, 0, 224, 224);
+		  		
+		  var data = canvas_224.toDataURL('image/png');
+		  photo_224.setAttribute('src', data);
+		} else {
+		  clearPhoto();
+		}
+	 }
+	function startup() {
+		video = document.getElementById('video');
+		canvas = document.getElementById('canvas');
+		photo = document.getElementById('photo');
+		canvas_224 = document.getElementById('canvas_224');
+		photo_224 = document.getElementById('photo_224');
+		startbutton = document.getElementById('startbutton');
+		video.addEventListener('canplay', function(ev){
+		  if (!streaming) {
+			height = video.videoHeight / (video.videoWidth/width);
+		  
+			video.setAttribute('width', width);
+			video.setAttribute('height', height);
+			canvas.setAttribute('width', width);
+			canvas.setAttribute('height', height);
+			console.log('Canvas ht :'+height+'  w:'+width);
+			streaming = true;
+		  }
+		}, false);
+		navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+			.then(function(stream) {
+				video.srcObject = stream;
+				video.play();
+			})
+			.catch(function(err) {
+				console.log("An error occurred: " + err);
+		});	
+		startbutton.addEventListener('click', function(ev){
+			  takePicture();
+			  ev.preventDefault();
+			}, false);
+		clearPhoto();
+	  }
+	window.addEventListener('load', startup, false);  
+//})();	
+</script>

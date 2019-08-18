@@ -1,0 +1,255 @@
+
+#set($htmlTitle = "File Upload")
+$web.startHtmlHeader("$htmlTitle")
+	$web.addJS("/studio/studio.js")
+	<script type="text/javascript">
+	
+	var imageId = 0, imageSig = '0';
+	
+	var uploadFiles = function(event){
+			var fileList = event.currentTarget.files;
+			if (fileList.length !== 1) return;
+			var file = fileList[0];
+			sendDMFile(file);
+
+		}
+	var buildParameters = function() {
+            // The following are required:
+            var params = {};
+            var picker_name = "filepicker2";
+            var upload_type = "files";
+            var file_type = "dms";
+            var creator_id = null;
+            var project_id = $web.getP("pid");
+            var projectcompany_id = null;
+            var single = "yes";
+            var filter = "jpg,jpeg,png,tiff";
+            var return_target = null;
+
+            // The following are not required for file upload/maybe for doc upload?
+            var content_source = 1;
+            var from_object_type = "folder";
+            var from_object_id = 3662;
+            var from_object_name = "Service Req";
+            var from_folder_path = "/";
+            var revisenodeids = null;
+            var nodefiles = null;
+            var from_object_type_2 = null;
+            var from_object_id_2 = null;
+            var from_fileids = null;
+            var stream = null;
+            var get_contents = null;
+            var budget_id = null;
+            var duplicatecheck = null;
+            var postcomplete = null;
+            var emailtarget = null;
+            var xrefdata = null;
+            var selectFileName = null;
+            var refreshOpener = true;
+            var maxsize = 1048576;
+            var ojetHomePageObject = null;
+            var searchType = null;
+
+            params["picker_name"] =(picker_name==null?'':picker_name);
+            if(content_source !=null)
+                params["content_source"]=(content_source==null?'':content_source);
+            if(upload_type !=null)
+                params["upload_type"]=(upload_type==null?'':upload_type);
+            if(file_type!=null)
+                params["file_type"]=(file_type==null?'':file_type);
+            params["from_object_type"]=(from_object_type==null?'':from_object_type);
+            params["from_object_id"]=(from_object_id==null?'':from_object_id);
+            params["from_object_name"]=(from_object_name==null?'':from_object_name);
+            params["from_folder_path"]=(from_folder_path==null?'':from_folder_path);
+            params["revisenodeids"]=(revisenodeids==null?'':revisenodeids);
+            params["nodefiles"]=(nodefiles==null?'':nodefiles);
+            if(creator_id !=null)
+                params["creator_id"]=(creator_id==null?'':creator_id);
+            if(project_id !=null)
+                params["project_id"]=(project_id==null?'':project_id);
+            if(projectcompany_id !=null)
+                params["projectcompany_id"]=(projectcompany_id==null?'':projectcompany_id);
+            params["from_object_type_2"]=(from_object_type_2==null?'':from_object_type_2);
+            params["from_object_id_2"]=(from_object_id_2==null?'':from_object_id_2);
+            params["from_fileids"]=(from_fileids==null?'':from_fileids);
+            if(single !=null)
+                params["single"]=(single==null?'':single);
+            if(filter !=null)
+                params["filter"]=(filter==null?'':filter);
+            if(stream !=null)
+                params["stream"]=(stream==null?'':stream);
+            if(get_contents !=null)
+                params["get_contents"]=(get_contents==null?'':get_contents);
+            params["return_target"]=(return_target==null?'': U.urefSearch(return_target)) ;
+            params["budget_id"]=(budget_id==null?'':budget_id);
+            params["duplicatecheck"]=duplicatecheck;
+            params["postcomplete"]=(postcomplete==null?'':postcomplete);
+            params["emailtarget"]=(emailtarget==null?'':emailtarget);
+            params["xrefdata"]=(xrefdata==null?'':xrefdata);
+            params["selectFileName"]=(selectFileName==null?'':selectFileName);
+            params["refreshOpener"]=(refreshOpener==null?'':refreshOpener);
+            params["maxsize"]=(maxsize==null?'':maxsize);
+            params["__token"]=U.token;
+            params["ojetHomePageObject"]="";
+            params["searchType"]="";
+            return params;
+        }
+	var fileData = {};
+	
+	function sendDMFile(file) {
+			console.log('DMSend file :'+file);
+			var url = U.appendRoot("/bp/sys/dm/new/upload?__uref="+U.uref);
+			var fd = new FormData();
+			var params = buildParameters();
+			params["filesize"]=file.size;
+			params["__token"] = U.token;
+			params["__uref"] = U.uref;
+			fd.append('params',JSON.stringify(params));
+			var fileMetaDataArr = [];
+            var fileInfo = {id: 0, fileName: file.name, docTitle: "",
+                                    fileNameHidden: file.name, parentId: 0,
+                                    fileSize:file.size};
+                            fileMetaDataArr.push(fileInfo);
+            fd.append('fileMetaDataArr[]', JSON.stringify(fileMetaDataArr));
+			fd.append('0', file);
+			var resp;
+			var imageId;
+			$.ajaxSetup({async: false});
+			$.ajax({
+				url         : url,
+				data        : fd,
+				cache       : false,
+				contentType : false,
+				processData : false,
+				type        : 'POST',
+				success     : function(rs, textStatus, jqXHR) {
+					resp = rs.returnError;
+					if (resp.error == "yes" && resp.errormsg !="") {
+						U.Validation(resp.errormsg);
+					}
+					else if (resp.uploadedfiles && resp.uploadedfiles.length >= 1) {
+						var fl = resp.uploadedfiles[0];
+						console.log('sendFile DM resp :'+resp+'  ::'+fl.id);
+						
+						imageId = fl.id;
+						var sig = resp.signature;
+						imageSig = sig[imageId];
+						const image_src =  U.appendRoot("/bp/file/getImageFile?id="+imageId+"&sig="+imageSig);
+						console.log('sendDMFile image src : '+image_src);
+						fileData = {"image_id":imageId,"resp":resp,"image_src":image_src,"error":"no","fl":fl};
+						//draw();
+						//document.getElementById("imageSelect").style.display="none";
+						//document.getElementById("imageName").style.display="block";
+						//
+						//processFile(fl,resp);
+					}
+				},
+				error		: function(jqxhr, textStatus, errorMessage) {
+					//self.dragText(self.dragPanelText);
+					U.Validation(errormsg);
+						
+					fileData =  {"image_id":imageId,"resp":resp,"image_src":image_src,"error":"yes"};
+				}
+			});
+			
+		}
+		function getFileData(){
+			return fileData;
+		}
+		function processFile(fileData,bpJson) {
+			const imageId = fileData.image_id;
+			const resp = fileData.resp;
+			var sig = resp.signature;
+			imageSig = sig[imageId];
+			/*self.imageName(fl.file_name + " file id: " + fl.id);
+			draw(scale);
+			document.getElementById("image_del_button").style.display = "block";
+			document.getElementById("imageSelect").style.display="none";
+			document.getElementById("imageName").style.display="block";*/
+			//var img = new Image();//$('<img />', { id: 'profileImage', width: 360, height:360});
+			//img.src = U.appendRoot("/bp/file/getImageFile?id="+imageId+"&sig="+imageSig);
+				
+			//img.onload = function(){
+					// do work here
+					
+			//}
+			
+			var module= "uxsrq";
+			var no_workflow=false;
+			var wf_id=3452;
+			if(bpJson.BP == 'Procurement'){
+				module= 'uxproc1';
+				wf_id  = 3454
+			}
+			console.log('processFile starting for model :'+module+' ::'+JSON.stringify(bpJson));
+			/*var json = {
+				usrSRTitle: "Title is Title",
+				uuu_user_lastname: "Jackson",
+				uuu_user_firstname: "Michael",
+				/*usrSRother: "",
+				usrEquipmentDP: ,
+				usrAddAssetDetailsTB500: ,
+				usrSRSubCatPD: ,
+				upmEqpTypePD: ,
+				upmEqpName: "",
+				uworEmergencyPD: ,
+				NCR_IssueDesc_Eng_txt: "",
+				usrServiceCategoryPD: ,
+				uRequesterDP: ,
+				file_id: fl.id,
+				comment: "Test Comment for File",
+				annotations: ""
+			}; */
+			//self.invokeCreateNewProcess(module,pid,no_workflow,wf_id, fl.doc_id
+			window.opener.invokeRecord(module,no_workflow,wf_id, fileData.fl.doc_id, bpJson);
+		}
+		/*
+		var draw = function(){
+			var canvas = document.getElementById("data-canvas");
+			var context = canvas.getContext("2d");
+
+
+			context.clearRect(0, 0, canvas.width, canvas.height);
+			context.restore();
+
+			context.save();
+		//	context.translate(canvas.width / 2, canvas.height / 2);
+			//context.scale(1.0, 1.0);
+
+			//context.beginPath(); // begin custom shape
+			if(imageId !=0){
+				var img = new Image();//$('<img />', { id: 'profileImage', width: 360, height:360});
+				img.src = U.appendRoot("/bp/file/getImageFile?id="+imageId+"&sig="+imageSig);
+				img.onload = function(){
+					context.drawImage(img, -180, -180, 360, 360);
+					img.style.display = "block";
+
+//					var circlectx = canvas.getContext("2d");
+//					circlectx.arc(0,0,180,0,2*Math.PI);
+//					circlectx.lineWidth = 1;
+//					circlectx.strokeStyle = "black";
+//					circlectx.stroke();
+					//runAndVisualizeInference(model, []);
+				}
+			}
+			context.closePath(); // complete custom shape
+
+		}*/
+		
+	</script>
+$web.endHtmlHeader()
+<body style="background-color:#FFFFF;">
+
+<div style="margin:20px;width:90%;">
+	<span  style="margin-left:20px;font-size:15px;font-family:Arial;">Select an image file for processing..</span>
+	<input id="uploadfiles" type="file" style="margin:20px;width:70%;" accept="image/*">
+	<div id="status" style="display:none" >Loading model...</div>
+	<canvas  style="margin:20px"  id="data-canvas" width="224" height="224"></canvas>
+</div>
+
+</body>
+<script>
+//$('#uploadfiles').on("change", uploadFiles);
+</script>
+<script src="/dist_10/od.unifier.js"></script>
+</html>

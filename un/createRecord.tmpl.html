@@ -1,0 +1,54 @@
+<div id="image-container" style="margin: 20px;">
+
+    <div id="imageSelect"
+         data-bind="css: {dragging: isDraggingOver}, event: {drop: drop, dragover: dragover, dragleave: dragleave, click:addImage}"
+         class="oj-panel dnd-container"
+         style="width: 96%; height: 40px; margin-left: 10px; cursor: pointer;">
+        <div style="margin-left: 40px;">
+		<span class='pgbu-bluesky-icon pgbu-icon-folder'
+              style="padding-right: 5px;"></span> <span id="selectImageUnderLine"
+                                                        class="pgbu-bold"
+                                                        style="padding-right: 2px; padding-left: 2px; color: #056abf; font-size: 12px;"
+                                                        data-bind="text: U.translate('Select an image'), event: {mouseover: underlineText, mouseout:removeUnderlineText} "></span>
+            <span class="pgbu-bold" style="padding-right: 2px; font-size: 12px;"
+                  data-bind="text: U.translate('or drag and drop it here') "></span></div>
+    </div>
+    <div id="imageName" class="oj-panel dnd-container"
+         style="width: 96%; height: 40px; margin-left: 10px; cursor: pointer; text-align: center;"><span class="pgbu-bold" style="padding-right: 2px; font-size: 12px;"
+         data-bind="text: imageName "></span></div>
+
+    <div
+            style="margin-top: 25px; margin-bottom: 30px; margin-left: 10px; width: 360px; height: 360px; border: 1px solid grey;"
+            id="myImage" data-bind="css: {dragging: isDraggingOver}, event: {drop: drop, dragover: dragover, dragleave: dragleave}">
+        <input type="file" style="display: none;" accept="image/*"
+               data-bind="event: {change: verify}">
+
+        <canvas id="imageCanvas"
+                style="border: 1px solid #d3d3d3;" width=360 height=360></canvas>
+
+
+    </div>
+
+    <!-- <div id="slider-container">
+        <oj-slider id="slider-id" aria-label="slider component"
+            value="{{value}}" min="[[min]]" max="[[max]]" step="[[step]]"
+            style='max-width:40em' data-bind="click:zoomImage"> </oj-slider>
+    </div> -->
+
+    <!--div class="oj-flex" style="margin-bottom: 5px; margin-top: 10px;">
+        <div class=" oj-sm-5 oj-md-5 oj-lg-5 oj-flex-item"></div>
+        <div class=" oj-sm-1 oj-md-1 oj-lg-1 oj-flex-item"></div>
+        <div class=" oj-sm-6 oj-md-6 oj-lg-6 oj-flex-item">
+            <div style="float: right; width: 210px;">
+                <button class="pgbu-button-dark oj-flex-item"
+                        data-bind="click: cancel,
+									   ojComponent: { component: 'ojButton', label: U.translate('Cancel') }">
+                </button>
+                <button class="pgbu-button-blue oj-flex-item" autofocus
+                        data-bind="click: uploadImage,
+									   ojComponent: { component: 'ojButton', label: U.translate('Save') }">
+                </button>
+            </div>
+        </div>
+    </div-->
+</div>
