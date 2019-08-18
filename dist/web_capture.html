@@ -1,0 +1,92 @@
+<!doctype html> 
+<style>
+#video {
+  border: 1px solid black;
+  box-shadow: 2px 2px 3px black;
+  width:320px;
+  height:240px;
+}
+
+#photo {
+  border: 1px solid black;
+  box-shadow: 2px 2px 3px black;
+  width:320px;
+  height:240px;
+}
+
+#canvas {
+  display:none;
+}
+#canvas {
+  display:none;
+}
+
+.camera {
+  width: 340px;
+  display:inline-block;
+}
+
+.output {
+  width: 340px;
+  display:inline-block;
+}
+
+#startbutton {
+  display:block;
+  position:relative;
+  margin-left:auto;
+  margin-right:auto;
+  bottom:32px;
+  background-color: rgba(0, 150, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0px 0px 1px 2px rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+  font-family: "Lucida Grande", "Arial", sans-serif;
+  color: rgba(255, 255, 255, 1.0);
+}
+
+.contentarea {
+  font-size: 16px;
+  font-family: "Lucida Grande", "Arial", sans-serif;
+  width: 760px;
+}
+</style>
+<body>
+<div class="camera">
+ <div id="status">Loading model...</div>
+    <video id="video">Video stream not available.</video>
+    <button id="startbutton">Take photo</button>
+  </div>
+  <canvas id="canvas1" style="display:none;">  </canvas>
+  <div class="output">
+    <img id="photo" alt="The screen capture will appear in this box."   style="display:none;">
+	<img id="photo_224" style="width:224px;height:224px;" alt="The screen capture will appear in this box.">
+  </div>
+ 
+    <div>
+	 <input type="file" style="display:none;" id="fileinput"  accept="image/*"/>
+    </div>
+	<div id="gallery"  style="display:none;"  ></div>
+    <div>
+      <canvas id="data-canvas" width="224" height="224"></canvas>
+	  <!--img id="test_image" style="height:224px;width:224px;" src="/test_images/usb-80.jpg"-->
+    </div>
+
+    <div>
+      <div>
+        <span>Inference time (ms):</span>
+        <span id="inference-time-ms"></span>
+      </div>
+      <div>
+        <span>&nbsp;</span>
+        <span class="shape-class" id="true-object-class"></span>
+      </div>
+      <div>
+        <span>Predicted object class:</span>
+        <span class="shape-class" id="predicted-object-class"></span>
+      </div>
+    </div>
+</body>
+
+
+<script src="/simple-od.e31bb0bc.js"></script>

@@ -1,0 +1,58 @@
+<!--
+Copyright 2018 Google LLC. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+==============================================================================
+-->
+
+<!doctype html>
+<head>
+  <link rel="stylesheet" href="/tfjs-examples.44bb3400.css">
+  <link rel="stylesheet" href="/style.e308ff8e.css">
+</head>
+
+<body>
+  <div class="tfjs-example-container centered-container">
+    <section class="title-area">
+      <h1>Unifier Image test</h1>
+      <p class="subtitle">Find defective objects</p>
+    </section>
+
+    <div id="status">Loading model...</div>
+    <div>
+	 <input type="file"  id="fileinput"  accept="image/*"/>
+    </div>
+	<div id="gallery"></div>
+    <div>
+      <canvas id="data-canvas" width="224" height="224"></canvas>
+	  <!--img id="test_image" style="height:224px;width:224px;" src="/test_images/usb-80.jpg"-->
+    </div>
+
+    <div>
+      <div>
+        <span>Inference time (ms):</span>
+        <span id="inference-time-ms"></span>
+      </div>
+      <div>
+        <span>&nbsp;</span>
+        <span class="shape-class" id="true-object-class"></span>
+      </div>
+      <div>
+        <span>Predicted object class:</span>
+        <span class="shape-class" id="predicted-object-class"></span>
+      </div>
+    </div>
+  </div>
+</body>
+
+<script src="/simple-od.e31bb0bc.js"></script>
