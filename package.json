@@ -15,7 +15,7 @@
     "argparse": "^1.0.10",
     "canvas": "^2.0.1",
     "get-pixels": "^3.3.2",
-    "node-fetch": "2.2.1"
+    "node-fetch": "2.6.1"
   },
   "scripts": {
     "watch": "cross-env NODE_ENV=development parcel index.html --no-hmr --open",
